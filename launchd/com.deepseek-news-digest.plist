@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.deepseek-news-digest</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/cccjoyyy/deepseek_news/scripts/run_daily_digest_scheduled.sh</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/cccjoyyy/deepseek_news</string>
+	<!-- 本地电脑时间，每天 11:00 -->
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>11</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+	<key>RunAtLoad</key>
+	<false/>
+</dict>
+</plist>

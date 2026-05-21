@@ -1,0 +1,5 @@
+# 每行一个 RSS 或 Atom 地址；# 开头为注释。
+# 建议复制本文件为 feeds.txt 后改成你常看的源（药监局、行业媒体、企业公告 RSS 等）。
+#
+# 以下为连通性示例（英文健康要闻；与「中国医药 AI 数字化」可能弱相关，模型会大量过滤）
+http://feeds.bbci.co.uk/news/health/rss.xml

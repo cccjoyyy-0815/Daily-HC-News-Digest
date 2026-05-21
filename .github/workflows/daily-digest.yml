@@ -1,0 +1,48 @@
+# 在 GitHub 云端每日运行：笔记本可关机、无需登录本机。
+# 时区说明：on.schedule 使用 UTC。默认 cron = 每天 03:00 UTC = 中国（东八区）11:00。
+# 若你不在东八区，请按「本地 11 点 − 时区偏移」换算后修改 cron。
+name: Daily digest email
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 11:00 北京时间（UTC+8）
+  workflow_dispatch: # 在 Actions 页可手动「Run workflow」试跑
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deepseek-news-digest
+  cancel-in-progress: false
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write .env from repository secret
+        env:
+          DIGEST_DOTENV: ${{ secrets.DIGEST_DOTENV }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          raw = os.environ.get("DIGEST_DOTENV") or ""
+          if not raw.strip():
+              print("::error::缺少仓库密钥 DIGEST_DOTENV。GitHub：Settings → Secrets and variables → Actions → New repository secret，名称 DIGEST_DOTENV，值粘贴本机 .env 全文。")
+              raise SystemExit(1)
+          Path(".env").write_text(raw, encoding="utf-8")
+          PY
+
+      - name: Run daily digest
+        run: python run_daily_digest.py

@@ -1,0 +1,3 @@
+# 每行一个 RSS 或 Atom 地址；# 开头为注释。
+# 可按需替换为药监局、行业媒体等订阅源。
+http://feeds.bbci.co.uk/news/health/rss.xml
