@@ -93,9 +93,23 @@ python3 run_daily_digest.py --dry-run
    - **Name**：`DIGEST_DOTENV`  
    - **Secret**：把你本机项目根目录 **`.env` 文件全文**复制进去（多行粘贴；与本地一致即可，含 `NEWS_SEARCH_QUERY`、SMTP、SerpAPI 等）。GitHub 会加密保存。
 3. 确认 **Actions** 未被禁用；工作流文件已在本仓库 **`.github/workflows/daily-digest.yml`**。  
-   - 默认 **每天 03:00 UTC** = **中国东八区 11:00**。若你不在东八区，请打开该 YAML，修改 `on.schedule.cron`（GitHub 只支持 UTC，需自行换算）。
-4. 在 **Actions** 页选中 **Daily digest email**，用 **Run workflow** 手动跑一次，确认能收到邮件。
-5. **若已装过本机 launchd**：请执行 `./scripts/uninstall_macos_launchd.sh`，否则云端与本机各跑一封，会**重复发两封**。
+   - 默认 **每天 03:00 UTC** = **中国（东八区）每天 11:00**。GitHub 的定时器**只认 UTC**，不会自动跟你的 Mac 时区走；若你长住其它时区，请改 YAML 里的 `cron`（并建议把同一文件里的 `TZ:` 改成你的时区，邮件标题里的「日期」才和当地一致）。
+4. 在 **Actions** 页选中 **Daily digest email** → **Run workflow**：可勾选 **dry_run** 试跑（不发邮件）；不勾选则真实发信。定时任务始终会发信（不走 dry_run）。
+
+**「本地每天 11:00」与 UTC cron 对照（每天 11:00 当地墙钟，无夏令时简表）**
+
+| 常居地（示例） | 与 UTC 差 | 若要当地 11:00，cron（分 时 * * *） |
+|----------------|-----------|--------------------------------------|
+| 中国 / 香港 / 新加坡 | +8 | `0 3 * * *`（默认） |
+| 日本 | +9 | `0 2 * * *` |
+| 美东（纽约等，标准时） | −5 | `0 16 * * *` |
+| 美西（洛杉矶等，标准时） | −8 | `0 19 * * *` |
+| 英国（标准时） | +0 | `0 11 * * *` |
+
+有夏令时的地区每年要改两次 cron，或用本机 **launchd**（真·本地 11 点，见下文）。也可用 [crontab.guru](https://crontab.guru) 核对。
+
+5. 定时或手动试跑成功后，检查邮箱与 GitHub Actions 运行日志。
+6. **若已装过本机 launchd**：请执行 `./scripts/uninstall_macos_launchd.sh`，否则云端与本机各跑一封，会**重复发两封**。
 
 说明：免费额度内一般足够；每次会安装依赖并访问 SerpAPI / DeepSeek / SMTP，与本地一次完整运行相当。
 

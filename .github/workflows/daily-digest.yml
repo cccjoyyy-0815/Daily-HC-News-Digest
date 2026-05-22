@@ -1,12 +1,20 @@
-# 在 GitHub 云端每日运行：笔记本可关机、无需登录本机。
-# 时区说明：on.schedule 使用 UTC。默认 cron = 每天 03:00 UTC = 中国（东八区）11:00。
-# 若你不在东八区，请按「本地 11 点 − 时区偏移」换算后修改 cron。
+# 在 GitHub 云端定时运行：笔记本可关机。
+#
+# 重要：on.schedule 的 cron 一律按 UTC。下面默认 = 北京时间（东八区）每天 11:00。
+# 若要「你所在时区的 11:00」，请改 cron（见仓库 README 里的对照表）。
+#
 name: Daily digest email
 
 on:
   schedule:
-    - cron: "0 3 * * *" # 11:00 北京时间（UTC+8）
-  workflow_dispatch: # 在 Actions 页可手动「Run workflow」试跑
+    # 每天 03:00 UTC = 中国（含香港）东八区 11:00
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "仅试跑（加 --dry-run，不发邮件；仍会请求 SerpAPI/DeepSeek）"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -19,6 +27,9 @@ jobs:
   send-digest:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # 邮件标题里的日期、日志时间按东八区（与默认 cron 一致）；若你改了 cron 指向其它时区，请同步改 TZ
+      TZ: Asia/Shanghai
     steps:
       - uses: actions/checkout@v4
 
@@ -45,4 +56,10 @@ jobs:
           PY
 
       - name: Run daily digest
-        run: python run_daily_digest.py
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "Dry run: 不发邮件"
+            python run_daily_digest.py --dry-run
+          else
+            python run_daily_digest.py
+          fi
