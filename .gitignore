@@ -1,6 +1,11 @@
 .env
 .venv/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
 # 定时任务运行日志
 logs/
 
