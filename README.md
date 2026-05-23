@@ -92,24 +92,32 @@ python3 run_daily_digest.py --dry-run
 2. 打开 **Settings → Secrets and variables → Actions → New repository secret**  
    - **Name**：`DIGEST_DOTENV`  
    - **Secret**：把你本机项目根目录 **`.env` 文件全文**复制进去（多行粘贴；与本地一致即可，含 `NEWS_SEARCH_QUERY`、SMTP、SerpAPI 等）。GitHub 会加密保存。
-3. 确认 **Actions** 未被禁用；工作流文件已在本仓库 **`.github/workflows/daily-digest.yml`**。  
-   - 默认 **每天 03:00 UTC** = **中国（东八区）每天 11:00**。GitHub 的定时器**只认 UTC**，不会自动跟你的 Mac 时区走；若你长住其它时区，请改 YAML 里的 `cron`（并建议把同一文件里的 `TZ:` 改成你的时区，邮件标题里的「日期」才和当地一致）。
+3. 确认 **Actions** 未被禁用；工作流见 **`.github/workflows/daily-digest.yml`**。  
+   - 使用 GitHub 支持的 **`timezone` + `cron`**：当前为 **`Asia/Shanghai` 每天 11:05**（略晚于整点，减轻官方文档所述「整点高负载」带来的延迟或偶发不跑）。若要严格 **11:00**，把 YAML 里 `cron` 的分钟从 `5` 改成 `0` 即可。
 4. 在 **Actions** 页选中 **Daily digest email** → **Run workflow**：可勾选 **dry_run** 试跑（不发邮件）；不勾选则真实发信。定时任务始终会发信（不走 dry_run）。
 
-**「本地每天 11:00」与 UTC cron 对照（每天 11:00 当地墙钟，无夏令时简表）**
+**若昨天没收到邮件，请按顺序自查**
+
+1. **Actions 里有没有昨天的运行记录**  
+   打开 **Actions → Daily digest email**，看对应日期是否有 **绿色成功** 或 **红色失败**。若**根本没有记录**：常见原因是仓库是 **fork**（定时默认关）、**workflow 文件不在默认分支**，或 **Actions 被仓库设置关掉**。若**有记录但失败**：点开看最后一步报错（SMTP、SerpAPI、缺密钥等）。
+2. **GitHub 官方说明**：定时任务在 Actions 高峰时**可能被推迟**；极端情况下整点队列过重**有丢跑可能**（见 [schedule 文档](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule)）。已把工作流改为 **带 timezone 的 11:05**，降低整点拥堵影响。
+3. **公开仓库 60 天无提交**：GitHub 会**自动停用**定时 workflow，需到 Actions 里 **Enable** 或随便推一个 commit。
+4. **本机 launchd 与云端二选一**：若两边都开着，可能发两封或你只注意到其中一封；若只用云端，请 `./scripts/uninstall_macos_launchd.sh`。
+5. **垃圾箱 / 推广邮件**里搜 `医药 AI 数字化` 或发件邮箱。
+
+**「本地每天 11:00」与 UTC cron 对照（仅在不使用 `timezone` 字段时参考；现已用 `Asia/Shanghai` 可忽略本表）**
 
 | 常居地（示例） | 与 UTC 差 | 若要当地 11:00，cron（分 时 * * *） |
 |----------------|-----------|--------------------------------------|
-| 中国 / 香港 / 新加坡 | +8 | `0 3 * * *`（默认） |
+| 中国 / 香港 / 新加坡 | +8 | `0 3 * * *`（旧写法，等价于上海 11:00） |
 | 日本 | +9 | `0 2 * * *` |
 | 美东（纽约等，标准时） | −5 | `0 16 * * *` |
 | 美西（洛杉矶等，标准时） | −8 | `0 19 * * *` |
 | 英国（标准时） | +0 | `0 11 * * *` |
 
-有夏令时的地区每年要改两次 cron，或用本机 **launchd**（真·本地 11 点，见下文）。也可用 [crontab.guru](https://crontab.guru) 核对。
+有夏令时的地区每年要改两次 cron，或改用 workflow 里的 **`timezone:`**（见 [GitHub 文档示例](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule)）。也可用 [crontab.guru](https://crontab.guru) 核对。
 
-5. 定时或手动试跑成功后，检查邮箱与 GitHub Actions 运行日志。
-6. **若已装过本机 launchd**：请执行 `./scripts/uninstall_macos_launchd.sh`，否则云端与本机各跑一封，会**重复发两封**。
+5. **若已装过本机 launchd**：请执行 `./scripts/uninstall_macos_launchd.sh`，否则云端与本机各跑一封，会**重复发两封**。
 
 说明：免费额度内一般足够；每次会安装依赖并访问 SerpAPI / DeepSeek / SMTP，与本地一次完整运行相当。
 

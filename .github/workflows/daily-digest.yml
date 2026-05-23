@@ -1,14 +1,14 @@
 # 在 GitHub 云端定时运行：笔记本可关机。
 #
-# 重要：on.schedule 的 cron 一律按 UTC。下面默认 = 北京时间（东八区）每天 11:00。
-# 若要「你所在时区的 11:00」，请改 cron（见仓库 README 里的对照表）。
+# 使用官方「timezone + cron」：按 Asia/Shanghai 每天 11:05 触发（比整点略晚，减轻 GitHub 整点队列拥堵导致的延迟/丢跑）。
+# 文档：https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
 #
 name: Daily digest email
 
 on:
   schedule:
-    # 每天 03:00 UTC = 中国（含香港）东八区 11:00
-    - cron: "0 3 * * *"
+    - cron: "5 11 * * *"
+      timezone: "Asia/Shanghai"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -28,7 +28,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # 邮件标题里的日期、日志时间按东八区（与默认 cron 一致）；若你改了 cron 指向其它时区，请同步改 TZ
       TZ: Asia/Shanghai
     steps:
       - uses: actions/checkout@v4
