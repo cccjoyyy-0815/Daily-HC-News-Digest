@@ -1,7 +1,9 @@
-# 在 GitHub 云端定时运行：笔记本可关机。
+# 定时触发时区（IANA）。cron 为 24 小时制：hour=11 是上午 11 点，hour=23 才是晚上 11 点。
 #
-# 使用官方「timezone + cron」：按 Asia/Shanghai 每天 11:05 触发（比整点略晚，减轻 GitHub 整点队列拥堵导致的延迟/丢跑）。
-# 文档：https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+# 默认 Asia/Shanghai = 北京时间每天 11:05（略晚于整点，减轻 GitHub 整点队列拥堵）。
+# 若你常住美国/加拿大、希望「当地上午 11 点」发信，请把 timezone 与下方 TZ 改为例如：
+#   America/Los_Angeles（美西）或 America/New_York（美东）。
+# 注意：用「上海 11 点」时，你人在美国会看到邮件在「当地夜里」到达，这是时差，不是 cron 写错。
 #
 name: Daily digest email
 
