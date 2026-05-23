@@ -1,16 +1,14 @@
-# 定时触发时区（IANA）。cron 为 24 小时制：hour=11 是上午 11 点，hour=23 才是晚上 11 点。
+# 美东（America/New_York）每天 11:05 发日报；cron 为 24 小时制（11=上午 11 点，23=晚上 11 点）。
+# 夏令时/冬令时由 GitHub 按 IANA 自动处理。
 #
-# 默认 Asia/Shanghai = 北京时间每天 11:05（略晚于整点，减轻 GitHub 整点队列拥堵）。
-# 若你常住美国/加拿大、希望「当地上午 11 点」发信，请把 timezone 与下方 TZ 改为例如：
-#   America/Los_Angeles（美西）或 America/New_York（美东）。
-# 注意：用「上海 11 点」时，你人在美国会看到邮件在「当地夜里」到达，这是时差，不是 cron 写错。
+# 若改回「北京时间上午 11 点」：timezone 与 TZ 均改为 Asia/Shanghai。
 #
 name: Daily digest email
 
 on:
   schedule:
     - cron: "5 11 * * *"
-      timezone: "Asia/Shanghai"
+      timezone: "America/New_York"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -30,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      TZ: Asia/Shanghai
+      TZ: America/New_York
     steps:
       - uses: actions/checkout@v4
 

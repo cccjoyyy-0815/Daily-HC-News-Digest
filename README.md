@@ -93,9 +93,9 @@ python3 run_daily_digest.py --dry-run
    - **Name**：`DIGEST_DOTENV`  
    - **Secret**：把你本机项目根目录 **`.env` 文件全文**复制进去（多行粘贴；与本地一致即可，含 `NEWS_SEARCH_QUERY`、SMTP、SerpAPI 等）。GitHub 会加密保存。
 3. 确认 **Actions** 未被禁用；工作流见 **`.github/workflows/daily-digest.yml`**。  
-   - 当前为 **`Asia/Shanghai` 每天 11:05** = **北京时间上午 11:05**（cron 为 **24 小时制**，`11` 是上午，不是晚上；晚上 11 点应写成 `23`）。  
-   - **若你人在美国/加拿大**，却沿用 `Asia/Shanghai`，邮件会按**北京时间上午**发出，换算到你当地往往是**前一天晚上**（例如美东约 22–23 点），看起来像「晚上才收到」——这时请把 YAML 里的 `timezone:` 与 `TZ:` 改成你常住地，例如 **`America/New_York`** 或 **`America/Los_Angeles`**，才是**你当地上午** 11 点。  
-   - 若要严格 **11:00** 整，把 `cron` 的分钟从 `5` 改成 `0`。
+   - 当前为 **`America/New_York` 每天 11:05** = **美国东部当地上午 11:05**（含夏令时处理）。邮件标题里的日期也按 `TZ` 与之一致。  
+   - **若你改回「北京时间上午 11 点」**：把同一文件里的 `timezone:` 与 `TZ:` 都改为 **`Asia/Shanghai`**。  
+   - 你曾遇到「美东凌晨 2 点、中国下午 2 点」收到：约等于 **UTC 6 点** 触发，与「北京上午 11 点」（约 UTC 3 点）不一致，多半是 GitHub 上仍是旧 workflow 或未 push；以 Actions 里该次运行的 **Start time** 为准核对。
 4. 在 **Actions** 页选中 **Daily digest email** → **Run workflow**：可勾选 **dry_run** 试跑（不发邮件）；不勾选则真实发信。定时任务始终会发信（不走 dry_run）。
 
 **若昨天没收到邮件，请按顺序自查**
